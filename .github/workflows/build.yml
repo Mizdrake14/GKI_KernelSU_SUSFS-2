@@ -131,6 +131,21 @@ jobs:
           
           $REPO --trace sync -c -j$(nproc --all) --no-tags --fail-fast
 
+      - name: Cherry-pick Custom Commits
+        run: |
+          echo "Cherry-picking custom commits into $CONFIG/common..."
+          cd "$CONFIG/common"
+
+          # Set gitconfig
+          git config --global user.name "mizdrake14"
+          git config --global user.email "mizdrake14@gmail.com"
+
+          # Fetch the specific branch from the remote repository
+          git fetch https://github.com/mizdrake7/WILDFlower-android13-5.15-common-GKI main
+
+          # Cherry-pick the specified range of commits
+          git cherry-pick d220c4cd8b0e4be6c5bd7f0bff11db100607191c^..f63ff000c9f66bdeff33886d3a1ab8886f3dca97
+
       - name: Extract Actual Sublevel for LTS Builds
         if: inputs.sub_level == 'X'
         run: |
