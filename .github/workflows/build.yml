@@ -91,23 +91,8 @@ jobs:
           # Checkout specific commits for SUSFS v1.5.12
           #cd susfs4ksu
           #case "${{ inputs.android_version }}-${{ inputs.kernel_version }}" in
-          #  "android12-5.10")
-          #    git checkout ed19454a4b5905e6718c9a22fad769b906837931
-          #    ;;
-          #  "android13-5.10")
-          #    git checkout 8919927b63d95e62d33842452b9a60546187fb7b
-          #    ;;
           #  "android13-5.15")
           #    git checkout 700b9316b5a1cab174401b57f4198782a17154fb
-          #    ;;
-          #  "android14-5.15")
-          #    git checkout e1b1bba04b3cada700b8fd5bda4cfd4c59de07a2
-          #    ;;
-          #  "android14-6.1")
-          #    git checkout f16560ce8263fbfa9b2f259e9531f72d6fda4e3f
-          #    ;;
-          #  "android15-6.6")
-          #    git checkout c49b1dab205bbc4ef20b120e84c5b7530355961d
           #    ;;
           #esac
           #cd ..
@@ -141,6 +126,27 @@ jobs:
           echo "===== $CONFIG Directory Space Usage in GB ====="
           cd "$CONFIG"
           du -BG -d 2 | sort -nr
+
+
+      - name: Cherry-pick Custom Commits
+        run: |
+          echo "Cherry-picking custom commits into $CONFIG/common..."
+          cd "$CONFIG/common"
+
+          # Set gitconfig
+          git config --global user.name "mizdrake14"
+          git config --global user.email "mizdrake14@gmail.com"
+
+          # Fetch the specific branch from the remote repository
+          git fetch https://github.com/mizdrake7/WILDFlower-android13-5.15-common-GKI main
+
+          # Cherry-pick the specified range of commits
+          git cherry-pick d220c4cd8b0e4be6c5bd7f0bff11db100607191c
+          git cherry-pick a9069c064688c145f02f61833d8eb9360fe22219
+          git cherry-pick 3a9f4b537b1d60767a9b2aaed5b34323fb965688
+          git cherry-pick 6ed32c3c7beca7599e2cebe5f120585a7bd42f8d^..a0b85696a172aba0f9f3334aa34a659affa3992d
+          git cherry-pick b7ebdacc4dad8024244d70b3014e85c8e41b61b9
+          git cherry-pick 603349003e1463b245daa733855f9aacadf8dc46
 
       - name: Extract Actual Sublevel for LTS Builds
         if: inputs.sub_level == 'X'
@@ -489,7 +495,7 @@ jobs:
         run: |
           cd "$CONFIG"
           #Add Wild to Kernel Version
-          sed -i '$s|echo "\$res"|echo "\$res-Wild"|' ./common/scripts/setlocalversion
+          sed -i '$s|echo "\$res"|echo "\$res-WildFlower"|' ./common/scripts/setlocalversion
           #Set Kernel Timestamp
           perl -pi -e 's{UTS_VERSION="\$\(echo \$UTS_VERSION \$CONFIG_FLAGS \$TIMESTAMP \| cut -b -\$UTS_LEN\)"}{UTS_VERSION="#1 SMP PREEMPT Sun Apr 20 04:20:00 UTC 2025"}' ./common/scripts/mkcompile_h
           if [ -f "build/build.sh" ]; then
